@@ -244,7 +244,3 @@ results = vsc.get_index(VECTOR_SEARCH_ENDPOINT_NAME, vs_index_fullname).similari
   num_results=1)
 docs = results.get('result', {}).get('data_array', [])
 pprint(docs)
-
-# COMMAND ----------
-
-
