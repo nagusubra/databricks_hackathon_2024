@@ -9,7 +9,8 @@
 
 # COMMAND ----------
 
-# %run ../_resources/00-init-advanced $reset_all_data=false
+# MAGIC %md
+# MAGIC #Import libraries and modules
 
 # COMMAND ----------
 
@@ -17,8 +18,27 @@
 
 # COMMAND ----------
 
+# For production use-case, install the libraries at your cluster level with an init script instead. 
+install_ocr_on_nodes()
+
+# COMMAND ----------
+
+from unstructured.partition.auto import partition
+import re
+from llama_index.langchain_helpers.text_splitter import SentenceSplitter
+from llama_index import Document, set_global_tokenizer
+from transformers import AutoTokenizer
+from typing import Iterator
+from mlflow.deployments import get_deploy_client
+import io
+from databricks.vector_search.client import VectorSearchClient
+from databricks.sdk import WorkspaceClient
+import databricks.sdk.service.catalog as c
+
+# COMMAND ----------
+
 # MAGIC %md
-# MAGIC #Create OEM volume storage
+# MAGIC #Create OEM documentation volume storage
 
 # COMMAND ----------
 
@@ -33,7 +53,11 @@ display(dbutils.fs.ls(volume_folder+"/input_data")) # manually upload user data
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC #Create pdf_raw table
+# MAGIC
 # MAGIC ##Read PDF files as binary data
+# MAGIC
+# MAGIC
 
 # COMMAND ----------
 
@@ -56,17 +80,9 @@ df = (spark.readStream
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #PDF chunking
+# MAGIC #PDF chunking with sentance splitter
 
 # COMMAND ----------
-
-# For production use-case, install the libraries at your cluster level with an init script instead. 
-install_ocr_on_nodes()
-
-# COMMAND ----------
-
-from unstructured.partition.auto import partition
-import re
 
 def extract_doc_text(x : bytes) -> str:
   # Read files and extract the values with unstructured
@@ -75,14 +91,9 @@ def extract_doc_text(x : bytes) -> str:
     txt = re.sub(r'\n', '', txt)
     return re.sub(r' ?\.', '.', txt)
   # Default split is by section of document, concatenate them all together because we want to split by sentence instead.
-  return "\n".join([clean_section(s.text) for s in sections]) 
+  return "\n".join([clean_section(s.text) for s in sections])
 
 # COMMAND ----------
-
-from llama_index.langchain_helpers.text_splitter import SentenceSplitter
-from llama_index import Document, set_global_tokenizer
-from transformers import AutoTokenizer
-from typing import Iterator
 
 # Reduce the arrow batch size as our PDF can be big in memory
 spark.conf.set("spark.sql.execution.arrow.maxRecordsPerBatch", 10)
@@ -110,14 +121,17 @@ def read_as_chunk(batch_iter: Iterator[pd.Series]) -> Iterator[pd.Series]:
 
 # COMMAND ----------
 
-from mlflow.deployments import get_deploy_client
+# # bge-large-en Foundation models are available using the /serving-endpoints/databricks-bge-large-en/invocations api. 
+# deploy_client = get_deploy_client("databricks")
 
-# bge-large-en Foundation models are available using the /serving-endpoints/databricks-bge-large-en/invocations api. 
-deploy_client = get_deploy_client("databricks")
+# ## NOTE: if you change your embedding model here, make sure you change it in the query step too
+# embeddings = deploy_client.predict(endpoint="databricks-bge-large-en", inputs={"input": ["What is Apache Spark?"]})
+# pprint(embeddings)
 
-## NOTE: if you change your embedding model here, make sure you change it in the query step too
-embeddings = deploy_client.predict(endpoint="databricks-bge-large-en", inputs={"input": ["What is Apache Spark?"]})
-pprint(embeddings)
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #Create pdf_transformed table
 
 # COMMAND ----------
 
@@ -154,7 +168,8 @@ def get_embedding(contents: pd.Series) -> pd.Series:
 
 # COMMAND ----------
 
-import io
+# MAGIC %md
+# MAGIC #Populate pdf_transformed table
 
 # COMMAND ----------
 
@@ -166,16 +181,6 @@ import io
     .trigger(availableNow=True)
     .option("checkpointLocation", f'dbfs:{volume_folder}/checkpoints/pdf_chunk')
     .table('pdf_transformed').awaitTermination())
-
-# #Let's also add our documentation web page from the simple demo (make sure you run the quickstart demo first)
-# if table_exists(f'{catalog}.{db}.pdf_clean'):
-#   (spark.readStream.option("skipChangeCommits", "true").table('pdf_clean') #skip changes for more stable demo
-#       .withColumn('embedding', get_embedding("content"))
-#       .select('url', 'content', 'embedding')
-#   .writeStream
-#     .trigger(availableNow=True)
-#     .option("checkpointLocation", f'dbfs:{volume_folder}/checkpoints/docs_chunks')
-#     .table('pdf_transformed').awaitTermination())
 
 # COMMAND ----------
 
@@ -189,7 +194,6 @@ import io
 
 # COMMAND ----------
 
-from databricks.vector_search.client import VectorSearchClient
 vsc = VectorSearchClient()
 
 if not endpoint_exists(vsc, VECTOR_SEARCH_ENDPOINT_NAME):
@@ -199,9 +203,6 @@ wait_for_vs_endpoint_to_be_ready(vsc, VECTOR_SEARCH_ENDPOINT_NAME)
 print(f"Endpoint named {VECTOR_SEARCH_ENDPOINT_NAME} is ready.")
 
 # COMMAND ----------
-
-from databricks.sdk import WorkspaceClient
-import databricks.sdk.service.catalog as c
 
 #The table we'd like to index
 source_table_fullname = f"{catalog}.{db}.pdf_transformed"

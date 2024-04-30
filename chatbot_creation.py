@@ -30,6 +30,15 @@ import json
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC #Import constants
+
+# COMMAND ----------
+
+os.environ['DATABRICKS_TOKEN'] = dbutils.secrets.get("dbdemos", "rag_sp_token")
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC #Important functions
 
 # COMMAND ----------
@@ -84,10 +93,6 @@ test_demo_permissions(host, secret_scope="dbdemos", secret_key="rag_sp_token", v
 
 print(VECTOR_SEARCH_ENDPOINT_NAME)
 print(index_name)
-
-# COMMAND ----------
-
-os.environ['DATABRICKS_TOKEN'] = dbutils.secrets.get("dbdemos", "rag_sp_token")
 
 # COMMAND ----------
 
@@ -359,4 +364,46 @@ display_chat(dialog["messages"], response)
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC #Model registeration in Unity Catalog
 
+# COMMAND ----------
+
+import cloudpickle
+import langchain
+from mlflow.models import infer_signature
+
+mlflow.set_registry_uri("databricks-uc")
+model_name = f"{catalog}.{db}.asset_nav_chatbot_model_version_1"
+
+with mlflow.start_run(run_name="asset_nav_chatbot_model_version_1_run_1") as run:
+    #Get our model signature from input/output
+    output = full_chain.invoke(dialog)
+    signature = infer_signature(dialog, output)
+
+    model_info = mlflow.langchain.log_model(
+        full_chain,
+        loader_fn=get_retriever,  # Load the retriever with DATABRICKS_TOKEN env as secret (for authentication).
+        artifact_path="chain",
+        registered_model_name=model_name,
+        pip_requirements=[
+            "mlflow==" + mlflow.__version__,
+            "langchain==" + langchain.__version__,
+            "databricks-vectorsearch",
+            "pydantic==2.5.2 --no-binary pydantic",
+            "cloudpickle=="+ cloudpickle.__version__
+        ],
+        input_example=dialog,
+        signature=signature,
+        example_no_conversion=True,
+    )
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ##Loading our model
+
+# COMMAND ----------
+
+model = mlflow.langchain.load_model(model_info.model_uri)
+model.invoke(dialog)
