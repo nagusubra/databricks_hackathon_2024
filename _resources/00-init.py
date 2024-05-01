@@ -14,10 +14,13 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../config
+# MAGIC %run "/Workspace/Repos/subramanian.narayana.ucalgary@gmail.com/databricks_hackathon_2024/config"
 
 # COMMAND ----------
 
+# %run ../config
+
+# COMMAND ----------
 
 dbutils.widgets.text("reset_all_data", "false", "Reset Data")
 reset_all_data = dbutils.widgets.get("reset_all_data") == "true"

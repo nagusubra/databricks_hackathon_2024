@@ -9,7 +9,11 @@
 
 # COMMAND ----------
 
-# MAGIC %run ./00-init
+# MAGIC %run "/Workspace/Repos/subramanian.narayana.ucalgary@gmail.com/databricks_hackathon_2024/_resources/00-init"
+
+# COMMAND ----------
+
+# %run ./00-init
 
 # COMMAND ----------
 

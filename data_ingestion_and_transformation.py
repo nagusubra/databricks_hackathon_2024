@@ -18,7 +18,7 @@
 
 # COMMAND ----------
 
-# For production use-case, install the libraries at your cluster level with an init script instead. 
+# For production use-case, install the libraries at your cluster level with an init script instead.
 install_ocr_on_nodes()
 
 # COMMAND ----------
