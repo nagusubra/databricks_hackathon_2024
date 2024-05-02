@@ -83,7 +83,7 @@ embedding_model = DatabricksEmbeddings(endpoint="databricks-bge-large-en")
 
 # COMMAND ----------
 
-index_name=f"{catalog}.{db}.pdf_transformed_self_managed_vs_index"
+index_name=f"{catalog}.{db}.pdf_transformed_self_managed_vector_search_index"
 host = "https://" + spark.conf.get("spark.databricks.workspaceUrl")
 
 #Let's make sure the secret is properly setup and can access our vector search index. Check the quick-start demo for more guidance

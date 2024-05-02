@@ -61,6 +61,15 @@ display(dbutils.fs.ls(volume_folder+"/input_data")) # manually upload user data
 
 # COMMAND ----------
 
+# %sql
+# DROP TABLE main.asset_nav.pdf_raw
+
+# COMMAND ----------
+
+# dbutils.fs.rm('dbfs:/Volumes/main/asset_nav/volume_oem_documentation/checkpoints/raw_docs', True)
+
+# COMMAND ----------
+
 df = (spark.readStream
         .format('cloudFiles')
         .option('cloudFiles.format', 'BINARYFILE')
@@ -105,7 +114,7 @@ def read_as_chunk(batch_iter: Iterator[pd.Series]) -> Iterator[pd.Series]:
       AutoTokenizer.from_pretrained("hf-internal-testing/llama-tokenizer")
     )
     #Sentence splitter from llama_index to split on sentences
-    splitter = SentenceSplitter(chunk_size=500, chunk_overlap=50)
+    splitter = SentenceSplitter(chunk_size=300, chunk_overlap=20)
     def extract_and_split(b):
       txt = extract_doc_text(b)
       nodes = splitter.get_nodes_from_documents([Document(text=txt)])
@@ -132,6 +141,15 @@ def read_as_chunk(batch_iter: Iterator[pd.Series]) -> Iterator[pd.Series]:
 
 # MAGIC %md
 # MAGIC #Create pdf_transformed table
+
+# COMMAND ----------
+
+# %sql
+# DROP TABLE main.asset_nav.pdf_transformed
+
+# COMMAND ----------
+
+# dbutils.fs.rm('dbfs:/Volumes/main/asset_nav/volume_oem_documentation/checkpoints/pdf_chunk', True)
 
 # COMMAND ----------
 
@@ -207,7 +225,7 @@ print(f"Endpoint named {VECTOR_SEARCH_ENDPOINT_NAME} is ready.")
 #The table we'd like to index
 source_table_fullname = f"{catalog}.{db}.pdf_transformed"
 # Where we want to store our index
-vs_index_fullname = f"{catalog}.{db}.pdf_transformed_self_managed_vs_index"
+vs_index_fullname = f"{catalog}.{db}.pdf_transformed_self_managed_vector_search_index"
 
 if not index_exists(vsc, VECTOR_SEARCH_ENDPOINT_NAME, vs_index_fullname):
   print(f"Creating index {vs_index_fullname} on endpoint {VECTOR_SEARCH_ENDPOINT_NAME}...")
@@ -236,6 +254,7 @@ else:
 
 question = "How can I track for IGBT issues in the inverter?"
 
+deploy_client = mlflow.deployments.get_deploy_client("databricks")
 response = deploy_client.predict(endpoint="databricks-bge-large-en", inputs={"input": [question]})
 embeddings = [e['embedding'] for e in response.data]
 

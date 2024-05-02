@@ -1,5 +1,7 @@
 # Databricks notebook source
-# MAGIC %pip install databricks-sdk==0.12.0 mlflow==2.10.1 textstat==0.7.3 tiktoken==0.5.1 evaluate==0.4.1 langchain==0.1.5 databricks-vectorsearch==0.22 transformers==4.30.2 torch==2.0.1 cloudpickle==2.2.1 pydantic==2.5.2
+# MAGIC %pip install mlflow==2.10.1 lxml==4.9.3 langchain==0.1.5 databricks-vectorsearch==0.22 cloudpickle==2.2.1 databricks-sdk==0.18.0 cloudpickle==2.2.1 pydantic==2.5.2 transformers==4.30.2 unstructured[pdf,docx]==0.10.30 llama-index==0.9.3 mlflow==2.10.1
+# MAGIC %pip install pip mlflow[databricks]==2.10.1
+# MAGIC
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
