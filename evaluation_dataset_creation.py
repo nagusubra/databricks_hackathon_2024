@@ -171,16 +171,6 @@ retriever = get_retriever()
 
 # COMMAND ----------
 
-# #The question is the last entry of the history
-# def extract_question(input):
-#     return input[-1]["content"]
-
-# #The history is everything before the last question
-# def extract_history(input):
-#     return input[:-1]
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC ####Prompt templates
 
@@ -400,13 +390,13 @@ def generate_answers_column(contents: pd.Series, questions: pd.Series) -> pd.Ser
 
 # COMMAND ----------
 
-(spark.readStream.table('pdf_raw')
-      .withColumn("content", F.explode(read_as_small_chunk("content")))
-      .selectExpr('path as url', 'content')
-  .writeStream
-    .trigger(availableNow=True)
-    .option("checkpointLocation", f'dbfs:{volume_folder}/checkpoints/pdf_pre_eval_chunk')
-    .table('pdf_pre_evaluation').awaitTermination())
+# (spark.readStream.table('pdf_raw')
+#       .withColumn("content", F.explode(read_as_small_chunk("content")))
+#       .selectExpr('path as url', 'content')
+#   .writeStream
+#     .trigger(availableNow=True)
+#     .option("checkpointLocation", f'dbfs:{volume_folder}/checkpoints/pdf_pre_eval_chunk')
+#     .table('pdf_pre_evaluation').awaitTermination())
 
 # COMMAND ----------
 
@@ -415,12 +405,12 @@ def generate_answers_column(contents: pd.Series, questions: pd.Series) -> pd.Ser
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC DROP TABLE main.asset_nav.pdf_evaluation
+# %sql
+# DROP TABLE main.asset_nav.pdf_evaluation
 
 # COMMAND ----------
 
-dbutils.fs.rm('dbfs:/Volumes/main/asset_nav/volume_oem_documentation/checkpoints/pdf_eval_chunk', True)
+# dbutils.fs.rm('dbfs:/Volumes/main/asset_nav/volume_oem_documentation/checkpoints/pdf_eval_chunk', True)
 
 # COMMAND ----------
 
@@ -441,37 +431,42 @@ dbutils.fs.rm('dbfs:/Volumes/main/asset_nav/volume_oem_documentation/checkpoints
 
 # COMMAND ----------
 
-import math
+# import math
 
-# Get the total count of rows in the table
-row_count = spark.sql("SELECT COUNT(*) FROM main.asset_nav.pdf_pre_evaluation").collect()[0][0]
+# # Get the total count of rows in the table
+# row_count = spark.sql("SELECT COUNT(*) FROM main.asset_nav.pdf_pre_evaluation").collect()[0][0]
 
-batch_size = 5
-batch_jump_size = 5
-iterations = math.ceil((row_count)/batch_size)
+# batch_size = 5
+# batch_jump_size = 5
+# iterations = math.ceil((row_count)/batch_size)
 
 
-# Loop through the table in batches of 10 rows
-for i in range(iterations):
+# # Loop through the table in batches of 10 rows
+# for i in range(iterations): # last successful i = 158, once running 158, remove it for normal range operation
 
-    # Fetch 10 rows starting from the current iteration
-    offset = i * batch_jump_size
+#     # Fetch 10 rows starting from the current iteration
+#     offset = i * batch_jump_size
 
-    print("Iteration #", i, " and processing row number", offset)
+#     print("Iteration #", i, " and processing row number", offset)
 
-    query = f"SELECT url, content FROM main.asset_nav.pdf_pre_evaluation LIMIT {batch_size} OFFSET {offset}"
-    df = spark.sql(query)
+#     query = f"SELECT url, content FROM main.asset_nav.pdf_pre_evaluation LIMIT {batch_size} OFFSET {offset}"
+#     df = spark.sql(query)
     
-    # Apply transformations
-    df = df.withColumn("question", generate_questions_column("content"))
-    df = df.withColumn("answer", generate_answers_column("content", "question"))
-    
-    # Display the transformed DataFrame
-    # display(df)
+#     # Apply transformations
 
+#     try:
+#         df = df.withColumn("question", generate_questions_column(df["content"]))
+#         df = df.withColumn("answer", generate_answers_column(df["content"], df["question"]))
+#     except:
+#         pass
 
-    df.write.format("delta").mode("append").saveAsTable("main.asset_nav.pdf_evaluation")
+#     # Display the transformed DataFrame
+#     # display(df)
 
+#     try:
+#         df.write.format("delta").mode("append").saveAsTable("main.asset_nav.pdf_evaluation")
+#     except:
+#         print("Iteration #", i, " and processing row number", offset, "    FAILED to convert to delta table !!! So skipping this one.")
 
 # COMMAND ----------
 
