@@ -60,17 +60,17 @@ def extract_history(input):
 
 # # we could try LLama 2 or LLama 3 or Mistral 7B -> least expensive or Mistrall 30B or dbrx -> most expensive
 
-# chat_model = ChatDatabricks(endpoint="databricks-dbrx-instruct", max_tokens = 200) # most expensive, but faster results and more accurate than Llaama 3
+# chat_model = ChatDatabricks(endpoint="databricks-dbrx-instruct", max_tokens = 500) # most expensive, but faster results and more accurate than Llaama 3
 
-# chat_model = ChatDatabricks(endpoint="databricks-meta-llama-3-70b-instruct", max_tokens = 200) # half the cost of DBRX, but accuracy and performance not better than DBRX
+# chat_model = ChatDatabricks(endpoint="databricks-meta-llama-3-70b-instruct", max_tokens = 500) # half the cost of DBRX, but accuracy and performance not better than DBRX
 
-# chat_model = ChatDatabricks(endpoint="databricks-llama-2-70b-chat", max_tokens = 200) # 1/4 the cost of DBRX, but accuracy and performance not better than DBRX (bigger miss in accuracy)
+# chat_model = ChatDatabricks(endpoint="databricks-llama-2-70b-chat", max_tokens = 500) # 1/4 the cost of DBRX, but accuracy and performance not better than DBRX (bigger miss in accuracy)
 
-chat_model = ChatDatabricks(endpoint="databricks-mixtral-8x7b-instruct", max_tokens = 200) # 1/4 the cost of DBRX, but accuracy and performance not better than DBRX and matches the performance of llama 3
+chat_model = ChatDatabricks(endpoint="databricks-mixtral-8x7b-instruct", max_tokens = 500) # 1/4 the cost of DBRX, but accuracy and performance not better than DBRX and matches the performance of llama 3
 
-# chat_model = ChatDatabricks(endpoint="databricks-mpt-7b-instruct", max_tokens = 200) # 404 error
+# chat_model = ChatDatabricks(endpoint="databricks-mpt-7b-instruct", max_tokens = 500) # 404 error
 
-# chat_model = ChatDatabricks(endpoint="databricks-mpt-30b-instruct", max_tokens = 200) # 404 error
+# chat_model = ChatDatabricks(endpoint="databricks-mpt-30b-instruct", max_tokens = 500) # 404 error
 
 # COMMAND ----------
 
@@ -361,6 +361,10 @@ dialog = {
 print(f'Testing with relevant history and question...')
 response = full_chain.invoke(dialog)
 display_chat(dialog["messages"], response)
+
+# COMMAND ----------
+
+response
 
 # COMMAND ----------
 
