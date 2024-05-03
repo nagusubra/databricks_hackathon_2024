@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %pip install -q mlflow[databricks]==2.10.1 lxml==4.9.3 databricks-vectorsearch==0.22 cloudpickle==2.2.1 databricks-sdk==0.18.0 cloudpickle==2.2.1 pydantic==2.5.2 transformers==4.30.2 unstructured[pdf,docx]==0.10.30 llama-index==0.9.3 langchain mlflow==2.10.1
+# MAGIC %pip install -q databricks-sdk==0.12.0 mlflow==2.10.1 textstat==0.7.3 tiktoken==0.5.1 evaluate==0.4.1 langchain==0.1.5 databricks-vectorsearch==0.22 transformers==4.30.2 torch==2.0.1 cloudpickle==2.2.1 pydantic==2.5.2 lxml==4.9.3
 # MAGIC
 # MAGIC dbutils.library.restartPython()
 
@@ -116,10 +116,6 @@ def predict_answer(questions):
 
 # COMMAND ----------
 
-db
-
-# COMMAND ----------
-
 df_qa = (spark.read.table('main.asset_nav.pdf_evaluation_clean')
                   .selectExpr('question as inputs', 'expected_answer as targets')
                   .where("targets is not null")
@@ -232,147 +228,6 @@ px.bar(df_genai_metrics['answer_correctness/v1/score'].value_counts(), title='An
 df_genai_metrics['toxicity'] = df_genai_metrics['toxicity/v1/score'] * 100
 fig = px.scatter(df_genai_metrics, x='toxicity', y='answer_correctness/v1/score', title='Toxicity vs Correctness', size=[10]*len(df_genai_metrics))
 fig.update_xaxes(tickformat=".2f")
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC #Evaluation using RAGAS
-
-# COMMAND ----------
-
-# MAGIC %pip install -U -q langchain openai ragas arxiv pymupdf chromadb wandb tiktoken datasets mlflow==2.10.1 datasets tqdm
-
-# COMMAND ----------
-
-# %pip install ragas
-
-# COMMAND ----------
-
-dbutils.library.restartPython()
-
-# COMMAND ----------
-
-from ragas.metrics import (
-    answer_relevancy,
-    faithfulness,
-    context_recall,
-    context_precision,
-    context_relevancy,
-    answer_correctness,
-    answer_similarity
-)
-
-from ragas.metrics.critique import harmfulness
-from ragas import evaluate
-from datasets import Dataset
-from tqdm import tqdm
-
-# COMMAND ----------
-
-import mlflow
-import os
-os.environ['DATABRICKS_TOKEN'] = dbutils.secrets.get("dbdemos", "rag_sp_token")
-model_name = f"{catalog}.{db}.asset_nav_chatbot_model_version_1"
-model_version_to_evaluate = get_latest_model_version(model_name)
-mlflow.set_registry_uri("databricks-uc")
-rag_model = mlflow.langchain.load_model(f"models:/{model_name}/{model_version_to_evaluate}")
-
-# @pandas_udf("string")
-# def predict_answer(questions):
-#     def answer_question(question):
-#         dialog = {"messages": [{"role": "user", "content": question}]}
-#         return rag_model.invoke(dialog)['result']
-#     return questions.apply(answer_question)
-
-# COMMAND ----------
-
-# dialog = {
-#     "messages": [
-#         {"role": "user", "content": "What is an Inverter?"}, 
-#         {"role": "assistant", "content": "A power inverter, or invertor is a power electronic device or circuitry that changes direct current to alternating current. The resulting AC frequency obtained depends on the particular device employed."}, 
-#         {"role": "user", "content": "What are all the fault codes in KACO inverter for overheating because of fans? and give me the ways to solve it."}
-#     ]
-# }
-# print(f'Testing with relevant history and question...')
-# response = rag_model.invoke(dialog)
-# display_chat(dialog["messages"], response)
-
-# COMMAND ----------
-
-# response["result"]
-
-# COMMAND ----------
-
-def create_ragas_dataset(rag_model, eval_dataset):
-  rag_dataset = []
-  for index, row in tqdm(eval_dataset.iterrows()):
-    answer = rag_model.invoke({"messages": [{"role": "user", "content": row["question"]}]})
-    rag_dataset.append(
-        {"question" : row["question"],
-         "answer" : answer["result"],
-         "contexts" : [row["context"]],
-         "ground_truths" : [row["ground_truth"]]
-         }
-    )
-  rag_df = pd.DataFrame(rag_dataset)
-  rag_eval_dataset = Dataset.from_pandas(rag_df)
-  return rag_eval_dataset
-
-def evaluate_ragas_dataset(ragas_dataset):
-  result = evaluate(
-    ragas_dataset,
-    metrics=[
-        context_precision,
-        faithfulness,
-        answer_relevancy,
-        context_recall,
-        context_relevancy,
-        answer_correctness,
-        answer_similarity
-    ],
-  )
-  return result
-
-# COMMAND ----------
-
-from tqdm import tqdm
-import pandas as pd
-eval_dataset = pd.read_csv("/Volumes/main/asset_nav/volume_oem_documentation/evaluation_data/solar_rag_pipeline_evaluation_datatset_manual_with_context.csv").drop(columns="id")
-display(eval_dataset)
-
-basic_qa_ragas_dataset = create_ragas_dataset(rag_model, eval_dataset)
-
-# COMMAND ----------
-
-display(basic_qa_ragas_dataset)
 
 # COMMAND ----------
 
