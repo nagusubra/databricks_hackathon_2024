@@ -52,9 +52,33 @@ document_drive_links={
 
 # COMMAND ----------
 
+df = spark.read.format("image").load("/Volumes/main/asset_nav/volume_oem_documentation/images/bear.png")
+display(df)
+
+# COMMAND ----------
+
+displayHTML("<img src ='/Volumes/main/asset_nav/volume_oem_documentation/images/bear.png'>")
+
+# COMMAND ----------
+
+displayHTML("<img src ='/Volumes/main/asset_nav/volume_oem_documentation/images/bear.png'>")
+
+# COMMAND ----------
+
+# Specify the source path of the file in the Databricks volume
+source_path = '/mnt/<volume-mount-point>/<file-path>'
+
+# Specify the destination path in Databricks where you want to copy the file
+destination_path = '/<destination-directory>/<file-name>'
+
+# Copy the file from the Databricks volume to Databricks
+dbutils.fs.cp(source_path, destination_path)
+
+# COMMAND ----------
+
 box_shadow = "10px 10px 10px #0071c9"
-user_background_color = "#b0dcff"
-rag_background_color = "#43a8f7"
+user_background_color = "#fdbf77"
+rag_background_color = "#fb9313"
 
 def user_message_html(message):
     return f"""
