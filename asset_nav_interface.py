@@ -52,7 +52,7 @@ document_drive_links={
 
 # COMMAND ----------
 
-box_shadow = "10px 10px 10px #0071c9"
+box_shadow = "10px 10px 10px #0077cc"
 user_background_color = "#fdbf77"
 rag_background_color = "#fb9313"
 
@@ -61,6 +61,11 @@ def user_message_html(message):
                 <head>
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+                    .glow {{
+                            font-weight: bold;
+                            text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
+                    }}
 
                     /* Custom CSS for chat bubbles */
                     .chat-container-user {{
@@ -109,7 +114,7 @@ def user_message_html(message):
                 <div class="chat-container-user">
                     <div style="display: flex; align-items: center;">
                         <div class="message-text-user">
-                            { f"<h1><strong>You</strong> <br></h1>" +  message}
+                            { f"<h1 class=glow><strong>You</strong> <br></h1>" +  message}
                         </div>
                         <img class="avatar-user" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png?raw=true"/>
                     </div>
@@ -121,6 +126,11 @@ def assistant_message_html(message):
                 <head>
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+                    .glow {{
+                            font-weight: bold;
+                            text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
+                    }}
 
                     /* Custom CSS for chat bubbles */
                     .chat-container-assistant {{
@@ -170,7 +180,7 @@ def assistant_message_html(message):
                     <div style="display: flex; align-items: center;">
                         <img class="avatar-assistant" src="https://e7.pngegg.com/pngimages/498/917/png-clipart-computer-icons-desktop-chatbot-icon-blue-angle-thumbnail.png?raw=true"/>
                         <div class="message-text-assistant">
-                            {"<h1><strong>Asset Nav Assistant</strong> <br></h1>" + message}
+                            {"<h1 class=glow ><strong>Asset Nav Assistant</strong> <br></h1>" + message}
                         </div>
                     </div>
                 </div>
