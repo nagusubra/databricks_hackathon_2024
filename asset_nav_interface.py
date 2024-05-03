@@ -209,13 +209,13 @@ def chatbot_interface(user_input, dialog_history_for_rag, dialog_history_for_use
     
     # print(f'Testing with relevant history and question...')
 
-    response = {'result': "172 Internal fan error: This fault code is displayed when there is a failure of an internal fan or the corresponding tacho signal. The power is reduced to 50% Pnom and all 3 LEDs light up on the device.\n\nCauses and solutions for this fault code:\n\n1. Fan blocked: Check if the fan is blocked by debris or foreign particles. If yes, clean it carefully.\n2. Plugs not correctly plugged in: Ensure that the plugs are correctly plugged in.\n\nAdditionally, to prevent overheating due to fans, follow these guidelines:\n\n1. Regularly clean the inverter and its surrounding area to avoid dust accumulation.\n2. Ensure proper ventilation around the inverter to allow heat dissipation.\n3. Regularly inspect the fans for wear and tear and replace them if necessary.\n4. Periodically check the electrical connections and wiring for loose connections or damage.\n5. Follow the manufacturer's recommended maintenance schedule for the inverter.",
- 'sources': ['dbfs:/Volumes/main/asset_nav/volume_oem_documentation/input_data/BP150_Manual_Kaco blueplanet_ Event codes - Vendor status codes - good.pdf',
-  'dbfs:/Volumes/main/asset_nav/volume_oem_documentation/input_data/BP150_Manual_Kaco blueplanet_1-9-2023 DCB - Manual extended - medium - 2.pdf',
-  'dbfs:/Volumes/main/asset_nav/volume_oem_documentation/input_data/BP150_Manual_Kaco blueplanet_ Event codes - Vendor status codes - good.pdf',
-  'dbfs:/Volumes/main/asset_nav/volume_oem_documentation/input_data/BP150_Manual_Kaco blueplanet_1-9-2023 DCB - Manual extended - medium - 2.pdf']}
+#     response = {'result': "172 Internal fan error: This fault code is displayed when there is a failure of an internal fan or the corresponding tacho signal. The power is reduced to 50% Pnom and all 3 LEDs light up on the device.\n\nCauses and solutions for this fault code:\n\n1. Fan blocked: Check if the fan is blocked by debris or foreign particles. If yes, clean it carefully.\n2. Plugs not correctly plugged in: Ensure that the plugs are correctly plugged in.\n\nAdditionally, to prevent overheating due to fans, follow these guidelines:\n\n1. Regularly clean the inverter and its surrounding area to avoid dust accumulation.\n2. Ensure proper ventilation around the inverter to allow heat dissipation.\n3. Regularly inspect the fans for wear and tear and replace them if necessary.\n4. Periodically check the electrical connections and wiring for loose connections or damage.\n5. Follow the manufacturer's recommended maintenance schedule for the inverter.",
+#  'sources': ['dbfs:/Volumes/main/asset_nav/volume_oem_documentation/input_data/BP150_Manual_Kaco blueplanet_ Event codes - Vendor status codes - good.pdf',
+#   'dbfs:/Volumes/main/asset_nav/volume_oem_documentation/input_data/BP150_Manual_Kaco blueplanet_1-9-2023 DCB - Manual extended - medium - 2.pdf',
+#   'dbfs:/Volumes/main/asset_nav/volume_oem_documentation/input_data/BP150_Manual_Kaco blueplanet_ Event codes - Vendor status codes - good.pdf',
+#   'dbfs:/Volumes/main/asset_nav/volume_oem_documentation/input_data/BP150_Manual_Kaco blueplanet_1-9-2023 DCB - Manual extended - medium - 2.pdf']}
     
-    # response = rag_model.invoke(dialog_history_for_rag)
+    response = rag_model.invoke(dialog_history_for_rag)
 
     dialog_history_for_rag["messages"].append({"role": "assistant", "content": response["result"]})
 
