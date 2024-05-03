@@ -22,36 +22,7 @@ from pyspark.sql.functions import col
 from mlflow.deployments import get_deploy_client
 deploy_client = get_deploy_client("databricks")
 
-try:
-    endpoint_name  = "dbdemos-azure-openai"
-    deploy_client.create_endpoint(
-        name=endpoint_name,
-        config={
-            "served_entities": [
-                {
-                    "name": endpoint_name,
-                    "external_model": {
-                        "name": "gpt-35-turbo",
-                        "provider": "openai",
-                        "task": "llm/v1/chat",
-                        "openai_config": {
-                            "openai_api_type": "azure",
-                            "openai_api_key": "{{secrets/dbdemos/azure-openai}}", #Replace with your own azure open ai key
-                            "openai_deployment_name": "dbdemo-gpt35",
-                            "openai_api_base": "https://dbdemos-open-ai.openai.azure.com/",
-                            "openai_api_version": "2023-05-15"
-                        }
-                    }
-                }
-            ]
-        }
-    )
-except Exception as e:
-    if 'RESOURCE_ALREADY_EXISTS' in str(e):
-        print('Endpoint already exists')
-    else:
-        print(f"Couldn't create the external endpoint with Azure OpenAI: {e}. Will fallback to databricks-dbrx-instruct as judge. Consider using a stronger model as a judge.")
-        endpoint_name = "databricks-dbrx-instruct"
+endpoint_name = "databricks-dbrx-instruct"
 
 #Let's query our external model endpoint
 answer_test = deploy_client.predict(endpoint=endpoint_name, inputs={"messages": [{"role": "user", "content": "What is Apache Spark?"}]})
@@ -84,7 +55,7 @@ answer_test['choices'][0]['message']['content']
 
 # COMMAND ----------
 
-evaluation_dataset_path = "/Volumes/main/asset_nav/volume_oem_documentation/evaluation_data/solar_rag_pipeline_evaluation_datatset_manual.csv"
+evaluation_dataset_path = "/Volumes/main/asset_nav/volume_oem_documentation/evaluation_data/solar_rag_pipeline_evaluation_datatset_manual_with_context.csv"
 df = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load(evaluation_dataset_path)
 df = df.withColumn("id", col("id").cast("bigint"))
 display(df)
@@ -117,7 +88,7 @@ def predict_answer(questions):
 # COMMAND ----------
 
 df_qa = (spark.read.table('main.asset_nav.pdf_evaluation_clean')
-                  .selectExpr('question as inputs', 'expected_answer as targets')
+                  .selectExpr('question as inputs', 'expected_answer as targets', 'context')
                   .where("targets is not null")
                   # .sample(fraction=0.005, seed=40) # .sample(fraction=0.005, seed=40): This line takes a random sample from the DataFrame. It randomly selects a fraction (0.5%) of the rows for the sample. The seed=40 parameter ensures that the sample is reproducible by setting a specific seed value.
         ) #small sample for interactive demo: This comment indicates that the sample size chosen (0.5%) is small for the purpose of an interactive demonstration.
@@ -134,11 +105,13 @@ display(df_qa_with_preds)
 
 # COMMAND ----------
 
-from mlflow.metrics.genai.metric_definitions import answer_correctness
+from mlflow.metrics.genai.metric_definitions import answer_correctness, answer_relevance, faithfulness
 from mlflow.metrics.genai import make_genai_metric, EvaluationExample
 
 # Because we have our labels (answers) within the evaluation dataset, we can evaluate the answer correctness as part of our metric. Again, this is optional.
 answer_correctness_metrics = answer_correctness(model=f"endpoints:/{endpoint_name}")
+answer_relevance_metrics = answer_relevance(model=f"endpoints:/{endpoint_name}")
+faithfulness_metrics = faithfulness(model=f"endpoints:/{endpoint_name}")
 print(answer_correctness_metrics)
 
 # COMMAND ----------
@@ -204,7 +177,7 @@ with mlflow.start_run(run_name="asset_nav") as run:
                                    model_type="question-answering", # toxicity and token_count will be evaluated   
                                    predictions="preds", # prediction column_name from eval_df
                                    targets = "targets",
-                                   extra_metrics=[answer_correctness_metrics, professionalism])
+                                   extra_metrics=[answer_correctness_metrics, answer_relevance_metrics, faithfulness_metrics, professionalism])
     
 eval_results.metrics
 
