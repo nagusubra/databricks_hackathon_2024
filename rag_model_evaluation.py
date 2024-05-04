@@ -113,7 +113,7 @@ def predict_answer(questions):
 
 # COMMAND ----------
 
-df_qa = (spark.read.table('main.asset_nav.pdf_evaluation_clean')
+df_qa = (spark.read.table(f'{catalog}.{db}.pdf_evaluation_clean')
                   .selectExpr('question as inputs', 'expected_answer as targets', 'context')
                   .where("targets is not null")
                   # .sample(fraction=0.005, seed=40) # .sample(fraction=0.005, seed=40): This line takes a random sample from the DataFrame. It randomly selects a fraction (0.5%) of the rows for the sample. The seed=40 parameter ensures that the sample is reproducible by setting a specific seed value.
@@ -256,4 +256,4 @@ fig.update_xaxes(tickformat=".2f")
 # COMMAND ----------
 
 client = MlflowClient()
-client.set_registered_model_alias(name=model_name, alias="prod", version=model_version_to_evaluate)
+client.set_registered_model_alias(name=model_name, alias=f"{catalog}_{db}_prod", version=model_version_to_evaluate)
