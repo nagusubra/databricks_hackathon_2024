@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC #Install libraries and modules
+
+# COMMAND ----------
+
 # MAGIC %pip install -q databricks-sdk==0.12.0 mlflow==2.10.1 textstat==0.7.3 tiktoken==0.5.1 evaluate==0.4.1 langchain==0.1.5 databricks-vectorsearch==0.22 transformers==4.30.2 torch==2.0.1 cloudpickle==2.2.1 pydantic==2.5.2 lxml==4.9.3
 # MAGIC
 # MAGIC dbutils.library.restartPython()
@@ -9,29 +14,38 @@
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC #Import libaries and modules
+
+# COMMAND ----------
+
 from pyspark.sql.functions import col
+import mlflow
+from mlflow.deployments import get_deploy_client
+from mlflow.metrics.genai.metric_definitions import answer_correctness, answer_relevance, faithfulness
+from mlflow.metrics.genai import make_genai_metric, EvaluationExample
+from mlflow.deployments import set_deployments_target
+import plotly.express as px
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #Creating OpenAI ChatGPT 3.5 as the judge for evaluation by setting up an endpoint
-# MAGIC ---> Since we cant create an endpoint now, it defaults to llama2-70-B as the judge
+# MAGIC #Creating DBRX instruct as the judge for evaluation
 
 # COMMAND ----------
 
-from mlflow.deployments import get_deploy_client
 deploy_client = get_deploy_client("databricks")
 
 endpoint_name = "databricks-dbrx-instruct"
 
-#Let's query our external model endpoint
-answer_test = deploy_client.predict(endpoint=endpoint_name, inputs={"messages": [{"role": "user", "content": "What is Apache Spark?"}]})
-answer_test['choices'][0]['message']['content']
+# #Let's query our external model endpoint
+# answer_test = deploy_client.predict(endpoint=endpoint_name, inputs={"messages": [{"role": "user", "content": "What is Apache Spark?"}]})
+# answer_test['choices'][0]['message']['content']
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #RAF model evaluation - offline
+# MAGIC #RAG model evaluation
 
 # COMMAND ----------
 
@@ -65,13 +79,12 @@ df.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsT
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Automated Evaluation of our chatbot model registered in Unity Catalog
+# MAGIC ## Automated Evaluation of our chatbot model registered in Unity Catalog
 # MAGIC
-# MAGIC Let's retrieve the chatbot model we registered in Unity Catalog and predict answers for each questions in the evaluation set.
+# MAGIC Retrieving the chatbot model we registered in Unity Catalog and predict answers for each questions in the evaluation set.
 
 # COMMAND ----------
 
-import mlflow
 os.environ['DATABRICKS_TOKEN'] = dbutils.secrets.get("dbdemos", "rag_sp_token")
 model_name = f"{catalog}.{db}.asset_nav_chatbot_model_version_1"
 model_version_to_evaluate = get_latest_model_version(model_name)
@@ -100,13 +113,34 @@ display(df_qa_with_preds)
 
 # MAGIC %md
 # MAGIC
-# MAGIC ##LLMs-as-a-judge: automated LLM evaluation with out of the box and custom GenAI metrics
+# MAGIC ##Automated LLM evaluation using DBRX as judge
 # MAGIC
 
 # COMMAND ----------
 
-from mlflow.metrics.genai.metric_definitions import answer_correctness, answer_relevance, faithfulness
-from mlflow.metrics.genai import make_genai_metric, EvaluationExample
+# MAGIC %md
+# MAGIC ### Evaluation metrics to be used and the meaning for the metrics
+# MAGIC
+# MAGIC 1. answer_correctness
+# MAGIC
+# MAGIC   This function will create a genai metric used to evaluate the answer correctness of an LLM using the model provided. Answer correctness will be assessed by the accuracy of the provided output based on the ground_truth, which should be specified in the targets column.
+# MAGIC
+# MAGIC   The targets eval_arg must be provided as part of the input dataset or output predictions. This can be mapped to a column of a different name using col_mapping in the evaluator_config parameter, or using the targets parameter in mlflow.evaluate().
+# MAGIC
+# MAGIC
+# MAGIC 2. answer_relevance
+# MAGIC
+# MAGIC   This function will create a genai metric used to evaluate the answer relevance of an LLM using the model provided. Answer relevance will be assessed based on the appropriateness and applicability of the output with respect to the input.
+# MAGIC   
+# MAGIC
+# MAGIC 3. faithfulness
+# MAGIC
+# MAGIC   This function will create a genai metric used to evaluate the faithfullness of an LLM using the model provided. Faithfulness will be assessed based on how factually consistent the output is to the context.
+# MAGIC
+# MAGIC   The context eval_arg must be provided as part of the input dataset or output predictions. This can be mapped to a column of a different name using col_mapping in the evaluator_config parameter.
+
+# COMMAND ----------
+
 
 # Because we have our labels (answers) within the evaluation dataset, we can evaluate the answer correctness as part of our metric. Again, this is optional.
 answer_correctness_metrics = answer_correctness(model=f"endpoints:/{endpoint_name}")
@@ -118,6 +152,8 @@ print(answer_correctness_metrics)
 
 # MAGIC %md
 # MAGIC ##Metrics templates
+# MAGIC
+# MAGIC Creating professionalism template
 
 # COMMAND ----------
 
@@ -167,8 +203,6 @@ print(professionalism)
 
 # COMMAND ----------
 
-from mlflow.deployments import set_deployments_target
-
 set_deployments_target("databricks")
 
 #This will automatically log all
@@ -188,7 +222,6 @@ display(df_genai_metrics)
 
 # COMMAND ----------
 
-import plotly.express as px
 px.histogram(df_genai_metrics, x="token_count", labels={"token_count": "Token Count"}, title="Distribution of Token Counts in Model Responses")
 
 # COMMAND ----------

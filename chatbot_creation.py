@@ -1,5 +1,10 @@
 # Databricks notebook source
-# MAGIC %pip install mlflow==2.10.1 lxml==4.9.3 langchain==0.1.5 databricks-vectorsearch==0.22 cloudpickle==2.2.1 databricks-sdk==0.18.0 cloudpickle==2.2.1 pydantic==2.5.2
+# MAGIC %md
+# MAGIC #Install libraries and modules
+
+# COMMAND ----------
+
+# MAGIC %pip install -q mlflow==2.10.1 lxml==4.9.3 langchain==0.1.5 databricks-vectorsearch==0.22 cloudpickle==2.2.1 databricks-sdk==0.18.0 cloudpickle==2.2.1 pydantic==2.5.2
 # MAGIC %pip install pip mlflow[databricks]==2.10.1
 # MAGIC dbutils.library.restartPython()
 
@@ -66,7 +71,7 @@ def extract_history(input):
 
 # chat_model = ChatDatabricks(endpoint="databricks-llama-2-70b-chat", max_tokens = 500) # 1/4 the cost of DBRX, but accuracy and performance not better than DBRX (bigger miss in accuracy)
 
-chat_model = ChatDatabricks(endpoint="databricks-mixtral-8x7b-instruct", max_tokens = 500) # 1/4 the cost of DBRX, but accuracy and performance not better than DBRX and matches the performance of llama 3
+chat_model = ChatDatabricks(endpoint="databricks-mixtral-8x7b-instruct", max_tokens = 500, temperature = 0.1) # 1/4 the cost of DBRX, but accuracy and performance not better than DBRX and matches the performance of llama 3, a lower sampling temprature would give more conservative,  deterministic and repeatable results
 
 # chat_model = ChatDatabricks(endpoint="databricks-mpt-7b-instruct", max_tokens = 500) # 404 error
 
@@ -86,7 +91,7 @@ embedding_model = DatabricksEmbeddings(endpoint="databricks-bge-large-en")
 index_name=f"{catalog}.{db}.pdf_transformed_self_managed_vector_search_index"
 host = "https://" + spark.conf.get("spark.databricks.workspaceUrl")
 
-#Let's make sure the secret is properly setup and can access our vector search index. Check the quick-start demo for more guidance
+#Let's make sure the secret is properly setup and can access our vector search index.
 test_demo_permissions(host, secret_scope="dbdemos", secret_key="rag_sp_token", vs_endpoint_name=VECTOR_SEARCH_ENDPOINT_NAME, index_name=index_name, embedding_endpoint_name="databricks-bge-large-en", managed_embeddings = False)
 
 # COMMAND ----------
@@ -97,19 +102,19 @@ print(index_name)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ##Validating input query chat - chain
+# MAGIC ##Validating input query chat for asset management domain - chain
 
 # COMMAND ----------
 
 validate_if_input_question_is_relevant_to_solar_energy = """
-You are classifying documents to know if this question is related to Solar Energy, Solar Energy producion, Solar Energy operations and maintenance, Solar Original Equipment Manifacturers, Original Equipment Manifacturer specifications, Original Equipment Manifacturer manuals, electrical engineering, engineering assets, capital spares, critical spares, Solar Panels, Inverters, DC/AC Disconnects, Meters, Wiring, Racking and Mounting, transformers, or something from a very different field. Also answer no if the last part is inappropriate. 
+You are classifying documents to know if this question is related to Solar Energy, Solar Energy production, operations, and maintenance, Solar Original Equipment manufacturers, Equipment Manufacturer specifications, Equipment manuals, electrical engineering, engineering assets, capital spares, critical spares, Solar Panels, Inverters, DC/AC Disconnects, Meters, Wiring, Racking and Mounting, transformers, or something from a very different field. Also, answer no if the last part is inappropriate.
 
 Here are some examples:
 
-Question: Knowing this followup history: What is an Inverter?, classify this question: Do you have more details?
+Question: Knowing this follow-up history: What is an Inverter?, classify this question: Do you have more details?
 Expected Response: Yes
 
-Question: Knowing this followup history: What is an Inverter?, classify this question: Write me a song.
+Question: Knowing this follow-up history: What is an Inverter?, classify this question: Write me a song.
 Expected Response: No
 
 Only answer with "yes" or "no". 
@@ -144,11 +149,29 @@ print(validate_if_input_chain_is_relevant_to_solar_energy.invoke({
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ##Connecting to vector store and vector search endpoint created for this project
+# MAGIC ##Retriever model function to connect to the vector store and vector search endpoint created for this project
 
 # COMMAND ----------
 
 def get_retriever(persist_dir: str = None):
+    '''
+    Retrieves a retriever object for performing document searches based on vector similarity.
+
+    Args:
+        persist_dir (str, optional): Directory path for persistence. Defaults to None.
+
+    Returns:
+        Retriever: A retriever object for performing document searches.
+
+    Raises:
+        KeyError: If the required environment variables are not set.
+        Exception: If there is an error retrieving the vector search index.
+
+    Example:
+        retriever = get_retriever(persist_dir="/path/to/persistence")
+        results = retriever.search("query text")
+    '''
+
     os.environ["DATABRICKS_HOST"] = host
     #Get the vector search index
     vsc = VectorSearchClient(workspace_url=host, personal_access_token=os.environ["DATABRICKS_TOKEN"])
@@ -184,7 +207,7 @@ retriever = get_retriever()
 # COMMAND ----------
 
 generate_query_to_retrieve_context_template = """
-Based on the chat history below, we want you to generate a query for an external data source to retrieve relevant documents so that we can better answer the question. The query should be in natual language and descriptive. The external data source uses similarity search to search for relevant documents in a vector space. So the query should be similar to the relevant documents semantically. Answer with only the query with a lot of detail. Do not add explanation.
+Based on the chat history below, we want you to generate a query for an external data source to retrieve relevant documents so that we can better answer the question. The query should be in natural language and descriptive. The external data source uses similarity search to search for relevant documents in a vector space. So the query should be similar to the relevant documents semantically. Answer with only the query containing detailed descriptions. Do not add explanation.
 
 Chat history: {chat_history}
 
@@ -234,6 +257,11 @@ generate_query_to_retrieve_context_chain = (
 
 # COMMAND ----------
 
+# Version 0 for solar energy
+# You are an assistant for solar energy operations and maintenance users who will be performing solar energy asset management. You are answering questions based on Solar Energy, Solar Energy producion and more related to Solar Energy. Provide simple answeras that poeople can understand and make it easy to learn from the context. Read the discussion to get the context of the previous conversation. In the chat discussion, you are referred to as "system". The user is referred to as "user".
+
+
+
 # Version 1 for solar energy
 # You are a trustful assistant for solar energy operations and maintenance users who will be performing solar energy asset management. You are answering questions based on Solar Energy, Solar Energy producion, Solar Energy operations and maintenance, Solar Original Equipment Manifacturers, Original Equipment Manifacturer specifications, Original Equipment Manifacturer manuals, electrical engineering, engineering assets, capital spares, critical spares, Solar Panels, Inverters, DC/AC Disconnects, Meters, Wiring, Racking and Mounting, transformers, and more related to Solar Energy. If you do not know the answer to a question, you truthfully say you do not know. Read the discussion to get the context of the previous conversation. In the chat discussion, you are referred to as "system". The user is referred to as "user".
 
@@ -250,27 +278,40 @@ generate_query_to_retrieve_context_chain = (
 
 
 
+# Version 3 for solar energy - advanced and updated
 
+# You are an accurate and reliable assistant for engineers and technicians working in solar energy operations and maintenance, specializing in management of solar energy assets with unparalleled expertise. You possess extensive expertise covering a wide range of topics, from intricate solar energy production details to operational procedures. You are well-versed in the guidelines and specifications provided by solar original equipment manufacturers (OEMs), diligently navigating through technical manuals and documentation.
 
+# Your proficiency extends beyond basic electrical engineering principles; you possess a deep understanding of Solar Energy, Solar Energy production, operations and maintenance, Solar Original Equipment manufacturers, Equipment Manufacturer specifications, Equipment manuals, electrical engineering, engineering assets, capital spares, critical spares, Solar Panels, Inverters, DC/AC Disconnects, Meters, Wiring, transformers, and ensuring the seamless functioning of solar energy systems.
 
+# Provide professional answers with depth and detail.
+
+# If you encounter a question to which you don't have an immediate answer, you will honestly acknowledge your limitation by saying "I don't have that information", prioritizing integrity in your assistance. Feel free to peruse our conversation history for contextual clarity, as you stand ready to provide invaluable insights and support. Throughout our discourse, you are addressed as "assistant," while I am identified as "user."
+
+# Discussion history: {chat_history}
+
+# Here's some context which might or might not help you answer: {context}
+
+# Answer straight, do not repeat the question, do not start with something like: the answer to the question, do not add "AI" in front of your answer, do not say: here is the answer, do not mention the context of the question.
+
+# Based on this history and context, answer this question: {question}
 
 # COMMAND ----------
 
 question_with_history_and_context_str = """
-You are an accurate and reliable assitant for engineers and technicians working in  solar energy operations and maintenance, specializing in the meticulous management of solar energy assets with unparalleled expertise. Your breadth of knowledge encompasses a vast spectrum of topics, ranging from the intricacies of solar energy production to the nuances of operational procedures. You are well-versed in the guidelines and specifications provided by solar original equipment manufacturers (OEMs), diligently navigating through technical manuals and documentation.
+You are an accurate and reliable assistant for engineers and technicians working in solar energy operations and maintenance, specializing in management of solar energy assets with unparalleled expertise. You possess extensive expertise covering a wide range of topics, from intricate solar energy production details to operational procedures. You are well-versed in the guidelines and specifications provided by solar original equipment manufacturers (OEMs), diligently navigating through technical manuals and documentation.
 
-Your proficiency extends beyond mere familiarity with electrical engineering principles; you possess a deep understanding of Solar Energy, Solar Energy producion, Solar Energy operations and maintenance, Solar Original Equipment Manifacturers, Original Equipment Manifacturer specifications, Original Equipment Manifacturer manuals, electrical engineering, engineering assets, capital spares, critical spares, Solar Panels, Inverters, DC/AC Disconnects, Meters, Wiring, Racking and Mounting, transformers, and ensuring the seamless functioning of solar energy systems.
+Your proficiency extends beyond basic electrical engineering principles; you possess a deep understanding of Solar Energy, Solar Energy production, operations and maintenance, Solar Original Equipment manufacturers, Equipment Manufacturer specifications, Equipment manuals, electrical engineering, engineering assets, capital spares, critical spares, Solar Panels, Inverters, DC/AC Disconnects, Meters, Wiring, transformers, and ensuring the seamless functioning of solar energy systems.
 
-Provide answers with depth and detail.
+Provide professional answers with depth and detail.
 
-Should an inquiry arise to which you lack an immediate answer, you transparently acknowledge your limitation, embodying honesty and integrity in your assistance. Feel free to peruse our conversation history for contextual clarity, as you stand ready to provide invaluable insights and support. Throughout our discourse, you are addressed as "system," while I am identified as "user."
+If you encounter a question to which you don't have an immediate answer, you will honestly acknowledge your limitation by saying "I don't have that information", prioritizing integrity in your assistance. Feel free to peruse our conversation history for contextual clarity, as you stand ready to provide invaluable insights and support. Throughout our discourse, you are addressed as "assistant," while I am identified as "user."
 
-
-Discussion: {chat_history}
+Discussion history: {chat_history}
 
 Here's some context which might or might not help you answer: {context}
 
-Answer straight, do not repeat the question, do not start with something like: the answer to the question, do not add "AI" in front of your answer, do not say: here is the answer, do not mention the context or the question.
+Answer straight, do not repeat the question, do not start with something like: the answer to the question, do not add "AI" in front of your answer, do not say: here is the answer, do not mention the context of the question.
 
 Based on this history and context, answer this question: {question}
 """
@@ -313,7 +354,7 @@ relevant_question_chain = (
 )
 
 irrelevant_question_chain = (
-  RunnableLambda(lambda x: {"result": 'Sorry, since the question does not pertain to power generation or power generation asset management, I unfortunately can not answer you. Please ask a questions relevant to power industry.', "sources": []})
+  RunnableLambda(lambda x: {"result": 'Sorry, since the question does not pertain to power generation or power generation asset management, I unfortunately can not answer you. Please ask questions relevant to the power industry.', "sources": []})
 )
 
 branch_node = RunnableBranch(
@@ -373,34 +414,34 @@ response
 
 # COMMAND ----------
 
-# import cloudpickle
-# import langchain
-# from mlflow.models import infer_signature
+import cloudpickle
+import langchain
+from mlflow.models import infer_signature
 
-# mlflow.set_registry_uri("databricks-uc")
-# model_name = f"{catalog}.{db}.asset_nav_chatbot_model_version_1"
+mlflow.set_registry_uri("databricks-uc")
+model_name = f"{catalog}.{db}.asset_nav_chatbot_model_version_1"
 
-# with mlflow.start_run(run_name="asset_nav_chatbot_model_version_1_run_1") as run:
-#     #Get our model signature from input/output
-#     output = full_chain.invoke(dialog)
-#     signature = infer_signature(dialog, output)
+with mlflow.start_run(run_name="asset_nav_chatbot_model_version_1_run_1") as run:
+    #Get our model signature from input/output
+    output = full_chain.invoke(dialog)
+    signature = infer_signature(dialog, output)
 
-#     model_info = mlflow.langchain.log_model(
-#         full_chain,
-#         loader_fn=get_retriever,  # Load the retriever with DATABRICKS_TOKEN env as secret (for authentication).
-#         artifact_path="chain",
-#         registered_model_name=model_name,
-#         pip_requirements=[
-#             "mlflow==" + mlflow.__version__,
-#             "langchain==" + langchain.__version__,
-#             "databricks-vectorsearch",
-#             "pydantic==2.5.2 --no-binary pydantic",
-#             "cloudpickle=="+ cloudpickle.__version__
-#         ],
-#         input_example=dialog,
-#         signature=signature,
-#         example_no_conversion=True,
-#     )
+    model_info = mlflow.langchain.log_model(
+        full_chain,
+        loader_fn=get_retriever,  # Load the retriever with DATABRICKS_TOKEN env as secret (for authentication).
+        artifact_path="chain",
+        registered_model_name=model_name,
+        pip_requirements=[
+            "mlflow==" + mlflow.__version__,
+            "langchain==" + langchain.__version__,
+            "databricks-vectorsearch",
+            "pydantic==2.5.2 --no-binary pydantic",
+            "cloudpickle=="+ cloudpickle.__version__
+        ],
+        input_example=dialog,
+        signature=signature,
+        example_no_conversion=True,
+    )
 
 # COMMAND ----------
 

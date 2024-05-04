@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC #Install libraries and modules
+
+# COMMAND ----------
+
 # MAGIC %pip install -q mlflow[databricks]==2.10.1 tqdm
 # MAGIC dbutils.library.restartPython()
 

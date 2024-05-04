@@ -1,5 +1,10 @@
 # Databricks notebook source
-# MAGIC %pip install mlflow==2.10.1 lxml==4.9.3 langchain==0.1.5 databricks-vectorsearch==0.22 cloudpickle==2.2.1 databricks-sdk==0.18.0 cloudpickle==2.2.1 pydantic==2.5.2 transformers==4.30.2 unstructured[pdf,docx]==0.10.30 llama-index==0.9.3 mlflow==2.10.1
+# MAGIC %md
+# MAGIC #Install libraries and modules
+
+# COMMAND ----------
+
+# MAGIC %pip install -q mlflow==2.10.1 lxml==4.9.3 langchain==0.1.5 databricks-vectorsearch==0.22 cloudpickle==2.2.1 databricks-sdk==0.18.0 cloudpickle==2.2.1 pydantic==2.5.2 transformers==4.30.2 unstructured[pdf,docx]==0.10.30 llama-index==0.9.3 mlflow==2.10.1
 # MAGIC %pip install pip mlflow[databricks]==2.10.1
 # MAGIC
 # MAGIC dbutils.library.restartPython()
@@ -12,10 +17,6 @@
 # COMMAND ----------
 
 # MAGIC %run /Workspace/Repos/subramanian.narayana.ucalgary@gmail.com/databricks_hackathon_2024/_resources/00-init-advanced $reset_all_data=false
-
-# COMMAND ----------
-
-# install_ocr_on_nodes()
 
 # COMMAND ----------
 
@@ -148,7 +149,7 @@ print(index_name)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ####Connecting to vector store and vector search endpoint created for this project
+# MAGIC ####Retriever model function to connect to the vector store and vector search endpoint created for this project
 
 # COMMAND ----------
 
@@ -209,6 +210,8 @@ qa_question_prompt_template = PromptTemplate(
 
 # COMMAND ----------
 
+# # testing the question generation chain
+
 # messages = qa_question_prompt_template.format(
 #     context=["context"],
 #     format_instructions='''
@@ -246,6 +249,8 @@ qa_answer_prompt_template = PromptTemplate(
 
 # COMMAND ----------
 
+# # testing answer generation chain
+
 # messages = qa_answer_prompt_template.format(
 #     context=["context"],
 #     question=''' \n{\n"question": "In what situations might a \'Device restart\' be recommended, as suggested in the provided context?"\n} ''',
@@ -269,6 +274,26 @@ qa_answer_prompt_template = PromptTemplate(
 spark.conf.set("spark.sql.execution.arrow.maxRecordsPerBatch", 10)
 @pandas_udf(StringType())
 def generate_questions_column(contents: pd.Series) -> pd.Series:
+    '''
+    Generates a series of questions based on the given contents.
+
+    Args:
+        contents (pd.Series): The content input to generate questions from.
+
+    Returns:
+        pd.Series: A series of generated questions.
+
+    Raises:
+        None
+
+    Notes:
+        - This function processes the contents in batches.
+        - Each batch is split into chunks to match the model's input size requirement.
+        - Questions are generated based on the context provided in each batch.
+        - The output is a series of generated questions in the same order as the input.
+
+    '''
+
     # Process each batch and collect the results
 
     # # Splitting the contents into batches of 150 items each, since the embedding model takes at most 150 inputs per request.
@@ -307,6 +332,25 @@ def generate_questions_column(contents: pd.Series) -> pd.Series:
 spark.conf.set("spark.sql.execution.arrow.maxRecordsPerBatch", 10)
 @pandas_udf(StringType())
 def generate_answers_column(contents: pd.Series, questions: pd.Series) -> pd.Series:
+    '''
+    Generates a series of answers based on the given contents and corresponding questions.
+
+    Args:
+        contents (pd.Series): The content input to generate answers from.
+        questions (pd.Series): The questions to generate answers for, corresponding to the contents.
+
+    Returns:
+        pd.Series: A series of generated answers.
+
+    Raises:
+        None
+
+    Notes:
+        - This function processes the contents and questions together.
+        - It creates a dictionary for each content-question pair.
+        - The output is a series of generated answers in the same order as the input.
+    '''
+
     # Process each batch and collect the results
 
     # # Splitting the contents into batches of 150 items each, since the embedding model takes at most 150 inputs per request.
@@ -400,6 +444,10 @@ def generate_answers_column(contents: pd.Series, questions: pd.Series) -> pd.Ser
 
 # COMMAND ----------
 
+# MAGIC %sql SELECT * FROM pdf_pre_evaluation LIMIT 2
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC #Create pdf_evaluation
 
@@ -485,3 +533,7 @@ def generate_answers_column(contents: pd.Series, questions: pd.Series) -> pd.Ser
 #     .trigger(availableNow=True)
 #     .option("checkpointLocation", f'dbfs:{volume_folder}/checkpoints/pdf_eval_chunk')
 #     .table('pdf_evaluation').awaitTermination())
+
+# COMMAND ----------
+
+# MAGIC %sql SELECT * FROM pdf_evaluation LIMIT 2
