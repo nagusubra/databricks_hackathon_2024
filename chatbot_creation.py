@@ -88,11 +88,13 @@ embedding_model = DatabricksEmbeddings(endpoint="databricks-bge-large-en")
 
 # COMMAND ----------
 
-index_name=f"{catalog}.{db}.pdf_transformed_self_managed_vector_search_index"
+index_name=f"{catalog}.{db}.pdf_transformed_self_managed_vector_search_index{iterative_text}"
 host = "https://" + spark.conf.get("spark.databricks.workspaceUrl")
 
-#Let's make sure the secret is properly setup and can access our vector search index.
-test_demo_permissions(host, secret_scope="dbdemos", secret_key="rag_sp_token", vs_endpoint_name=VECTOR_SEARCH_ENDPOINT_NAME, index_name=index_name, embedding_endpoint_name="databricks-bge-large-en", managed_embeddings = False)
+# COMMAND ----------
+
+# #Let's make sure the secret is properly setup and can access our vector search index.
+# test_demo_permissions(host, secret_scope="dbdemos", secret_key="rag_sp_token", vs_endpoint_name=VECTOR_SEARCH_ENDPOINT_NAME, index_name=index_name, embedding_endpoint_name="databricks-bge-large-en", managed_embeddings = False)
 
 # COMMAND ----------
 
