@@ -10,7 +10,7 @@
 # COMMAND ----------
 
 iterative_text = "_chunk_250_op_20_k_3" # _chunk_250_op_20_k_3
-VECTOR_SEARCH_ENDPOINT_NAME="asset_nav_vector_search_endpoint" + iterative_text
+VECTOR_SEARCH_ENDPOINT_NAME="asset_nav_vector_search_endpoint"
 dbName = db = "asset_nav" + iterative_text
 desired_chunk_size = 250
 desired_overlap_size = 20

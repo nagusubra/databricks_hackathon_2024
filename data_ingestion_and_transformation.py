@@ -48,7 +48,11 @@ import databricks.sdk.service.catalog as c
 # COMMAND ----------
 
 volume_folder =  f"/Volumes/{catalog}/{db}/volume_oem_documentation"
-display(dbutils.fs.ls(volume_folder+"/input_data")) # manually upload user data
+print(volume_folder)
+
+# COMMAND ----------
+
+# display(dbutils.fs.ls(volume_folder+"/input_data")) # manually upload user data
 
 # COMMAND ----------
 
@@ -251,7 +255,7 @@ print(f"Endpoint named {VECTOR_SEARCH_ENDPOINT_NAME} is ready.")
 #The table we'd like to index
 source_table_fullname = f"{catalog}.{db}.pdf_transformed"
 # Where we want to store our index
-vs_index_fullname = f"{catalog}.{db}.pdf_transformed_self_managed_vector_search_index"
+vs_index_fullname = f"{catalog}.{db}.pdf_transformed_self_managed_vector_search_index{iterative_text}"
 
 if not index_exists(vsc, VECTOR_SEARCH_ENDPOINT_NAME, vs_index_fullname):
   print(f"Creating index {vs_index_fullname} on endpoint {VECTOR_SEARCH_ENDPOINT_NAME}...")

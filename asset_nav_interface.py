@@ -46,13 +46,15 @@ rag_model = mlflow.langchain.load_model(f"models:/{model_name}/{model_version_to
 
 document_drive_links={
                         "BP150_Manual_Kaco blueplanet_ Event codes - Vendor status codes - good.pdf": "https://drive.google.com/file/d/1WoNhXll_AKWL3ZFoEcNk0uoVBEcsdVVr/view?usp=sharing",
-                        "BP150_Manual_Kaco blueplanet_1-9-2023 DCB - Manual extended - medium - 2.pdf": "https://drive.google.com/file/d/1CLxl3ueXyDxm60KLjA0Ak7V7p_YL0EkK/view?usp=sharing",
+                        "BP150_Manual_Kaco blueplanet_1-9-2023 DCB - Manual extended - medium - 2.pdf": "https://drive.google.com/file/d/1cks50GQY35_uc2IiZjzhNwBd6_hsPrjt/view?usp=sharing",
                         "BP150_Manual_Kaco blueplanet_1-9-2023 DCB - Quick guide - good.pdf": "https://drive.google.com/file/d/1IQa-_d6B8dVAd8Zad1LBqipeYQVD2iEI/view?usp=sharing",
-                        "Data sheet Kaco blue panet 150 TL3 - medium - 2.pdf": "https://drive.google.com/file/d/1p803z6u4H9YOKbz74J5ZdkB-ISxuhhXb/view?usp=sharing",
+                        "Data sheet Kaco blue panet 150 TL3 - medium - 2.pdf": "https://drive.google.com/file/d/1cks50GQY35_uc2IiZjzhNwBd6_hsPrjt/view?usp=sharing",
                         "Frequently Asked Questions About Maintenance of Solar Sites - good.pdf": "https://drive.google.com/file/d/1vj1C8i1rkNRps7HjQwM5eXXJhem_DzB4/view?usp=sharing",
-                        "MNL_BP_87.0-165TL3_DSCK-InstallManuel_210504_en - good - 2.pdf": "https://drive.google.com/file/d/1ON9H6suHiDdlnx6imITf9HDv0olqXgGe/view?usp=sharing",
+                        "MNL_BP_87.0-165TL3_DSCK-InstallManuel_210504_en - good - 2.pdf": "https://drive.google.com/file/d/1DzNqe96PyODbpBbgL2hPy1y2rd8y64th/view?usp=sharing",
                         "Solar Asset Management - good.pdf": "https://drive.google.com/file/d/1itXqAVm-H3HaG2wFk2CRHwmUZMhcVWsD/view?usp=sharing",
-                        "Solar-Basics - good.pdf": "https://drive.google.com/file/d/1z9uIzO-BNfERmmlXBkbx20sqacALyDyN/view?usp=sharing"
+                        "Solar-Basics - good.pdf": "https://drive.google.com/file/d/1z9uIzO-BNfERmmlXBkbx20sqacALyDyN/view?usp=sharing",
+                        "Solar fleet 01-05-2024 demo_case_data.pdf": "https://drive.google.com/file/d/1NvvNoQagNdHMAkpkI8mbkz_y7s5owbTY/view?usp=sharing",
+                        "Solar Fleet Operations and Maintenance weekly report.pdf": "https://drive.google.com/file/d/1Ym8zKlp0Oct8fKNwiY17eBDFxS939yFl/view?usp=drive_link",
 }
 
 # COMMAND ----------
