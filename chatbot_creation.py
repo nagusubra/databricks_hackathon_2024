@@ -153,6 +153,10 @@ print(validate_if_input_chain_is_relevant_to_solar_energy.invoke({
 
 # COMMAND ----------
 
+print("desired_k_value: ", desired_k_value)
+
+# COMMAND ----------
+
 def get_retriever(persist_dir: str = None):
     '''
     Retrieves a retriever object for performing document searches based on vector similarity.
@@ -184,7 +188,7 @@ def get_retriever(persist_dir: str = None):
     vectorstore = DatabricksVectorSearch(
         vs_index, text_column="content", embedding=embedding_model, columns=["url"]
     )
-    return vectorstore.as_retriever(search_kwargs={'k': 4})
+    return vectorstore.as_retriever(search_kwargs={'k': desired_k_value})
 
 retriever = get_retriever()
 

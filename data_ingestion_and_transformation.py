@@ -111,6 +111,11 @@ def extract_doc_text(x : bytes) -> str:
 
 # COMMAND ----------
 
+print("desired_chunk_size: ", desired_chunk_size)
+print("desired_overlap_size: ", desired_overlap_size)
+
+# COMMAND ----------
+
 # Reduce the arrow batch size as our PDF can be big in memory
 spark.conf.set("spark.sql.execution.arrow.maxRecordsPerBatch", 10)
 
@@ -121,7 +126,7 @@ def read_as_chunk(batch_iter: Iterator[pd.Series]) -> Iterator[pd.Series]:
     AutoTokenizer.from_pretrained("hf-internal-testing/llama-tokenizer")
   )
   #Sentence splitter from llama_index to split on sentences
-  splitter = SentenceSplitter(chunk_size=250, chunk_overlap=20)
+  splitter = SentenceSplitter(chunk_size=desired_chunk_size, chunk_overlap=desired_overlap_size)
   def extract_and_split(b):
     txt = extract_doc_text(b)
     nodes = splitter.get_nodes_from_documents([Document(text=txt)])
