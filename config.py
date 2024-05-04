@@ -9,14 +9,16 @@
 
 # COMMAND ----------
 
-iterative_text = "_chunk_250_op_20_k_3" # _chunk_250_op_20_k_3
-VECTOR_SEARCH_ENDPOINT_NAME="asset_nav_vector_search_endpoint"
-dbName = db = "asset_nav" + iterative_text
+# to be configured
 desired_chunk_size = 250
 desired_overlap_size = 20
 desired_k_value = 3
+iterative_text = "_chunk_250_op_20_k_3" # _chunk_250_op_20_k_3
 
+# automated inference use case
 catalog = "main"
+VECTOR_SEARCH_ENDPOINT_NAME="asset_nav_vector_search_endpoint"
+dbName = db = "asset_nav" + iterative_text
 DATABRICKS_SITEMAP_URL = "https://docs.databricks.com/en/doc-sitemap.xml"
 
 # COMMAND ----------
