@@ -10,12 +10,12 @@
 # COMMAND ----------
 
 VECTOR_SEARCH_ENDPOINT_NAME="asset_nav_vector_search_endpoint"
-
-DATABRICKS_SITEMAP_URL = "https://docs.databricks.com/en/doc-sitemap.xml"
+dbName = db = "asset_nav"
 
 catalog = "main"
+DATABRICKS_SITEMAP_URL = "https://docs.databricks.com/en/doc-sitemap.xml"
 
-dbName = db = "asset_nav"
+
 
 # COMMAND ----------
 
