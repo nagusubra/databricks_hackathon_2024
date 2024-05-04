@@ -9,11 +9,12 @@
 
 # COMMAND ----------
 
-VECTOR_SEARCH_ENDPOINT_NAME="asset_nav_vector_search_endpoint"
-dbName = db = "asset_nav"
+iterative_text = "_chunk_250_op_20_k_3" # _chunk_250_op_20_k_3
+VECTOR_SEARCH_ENDPOINT_NAME="asset_nav_vector_search_endpoint" + iterative_text
+dbName = db = "asset_nav" + iterative_text
 desired_chunk_size = 250
 desired_overlap_size = 20
-desired_k_value = 4
+desired_k_value = 3
 
 catalog = "main"
 DATABRICKS_SITEMAP_URL = "https://docs.databricks.com/en/doc-sitemap.xml"
