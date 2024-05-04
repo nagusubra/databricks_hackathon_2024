@@ -87,7 +87,7 @@ df = spark.read.format("csv").option("header", "true").option("inferSchema", "tr
 df = df.withColumn("id", col("id").cast("bigint"))
 display(df)
 
-df.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable("{catalog}.{db}.pdf_evaluation_clean")
+df.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{catalog}.{db}.pdf_evaluation_clean")
 
 # COMMAND ----------
 

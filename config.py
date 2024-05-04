@@ -15,8 +15,6 @@ dbName = db = "asset_nav"
 catalog = "main"
 DATABRICKS_SITEMAP_URL = "https://docs.databricks.com/en/doc-sitemap.xml"
 
-
-
 # COMMAND ----------
 
 # MAGIC %md
