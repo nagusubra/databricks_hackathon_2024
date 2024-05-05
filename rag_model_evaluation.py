@@ -219,7 +219,7 @@ print(professionalism)
 set_deployments_target("databricks")
 
 #This will automatically log all
-with mlflow.start_run(run_name="asset_nav") as run:
+with mlflow.start_run(run_name="asset_nav"+iterative_text) as run:
     eval_results = mlflow.evaluate(data = df_qa_with_preds.toPandas(), # evaluation data,
                                    model_type="question-answering", # toxicity and token_count will be evaluated   
                                    predictions="preds", # prediction column_name from eval_df
