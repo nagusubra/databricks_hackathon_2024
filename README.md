@@ -22,6 +22,8 @@ In crafting Asset Nav Assistant, we employed Databricks and AWS as our foundatio
 1. Evaluation Data for Model: Scaling to diverse energy types led to accumulating vast data volumes with limited datasets for evaluation. To tackle this, we're devising an explorative evaluation data generation pipeline employing Instruct LLMs. This pipeline will generate context-based questions and answers to enrich our evaluation process.
 2. Model Evaluation Metrics: Choosing appropriate metrics poses a challenge due to the industry's highly specific data.
 3. Cost and Compute management: Execution of text based data, running models, creating serving endpoints, etc are compute intensive and cost intensive. We plan to deploy performance improvements to increase efficency of the RAG pipeline to mitage the cost and compute risks.
+4. Model deployement challenges: Due to limitations of workspace requirements, we faced deployment issue for the RAG pipeline. We plan to Gradio/Streamlit for the mobile/tablet application development but hindered due to deployment issues.
+5. Databricks Trial Workspace Limitation: Constraints on workspace usage and advanced features limited us from exploring the next steps for our project, but we intend to resolve this issue to implement our future strategy.
 
 
 ## Accomplishments that we're proud of
@@ -29,6 +31,7 @@ In crafting Asset Nav Assistant, we employed Databricks and AWS as our foundatio
 1. Achieved solution development within a tight 2-week timeframe, employing rapid prototyping and iterative enhancements.
 2. Successfully constructed an end-to-end RAG solution, primed for deployment via Databricks serving endpoints.
 3. Established a proof of concept aimed at streamlining technicians' and engineers' workflows, significantly reducing document access time and consolidating information from diverse data sources.
+4. We developed an end-to-end RAG solution tailored to our dataset, finely tuned based on evaluation metrics, and equipped with UI interface within Databricks now fully prepared for deployment and scaling to different energy types.
 
 
 ## What we learned
