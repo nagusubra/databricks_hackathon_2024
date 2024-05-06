@@ -19,7 +19,7 @@ Moreover, we aim to develop a guide for new employees, this guide will offer mor
 
 In crafting Asset Nav Assistant, we employed Databricks and AWS as our foundational technologies and underwent the following phases:
  
-Preparation Phase: Parse, chunk, and store data in vector format in Unity Catalog.
+Preparation Phase: Parse, chunk, and store task specific data in vector format in Unity Catalog.
 Retrieval Phase: Employ the bge-large-en model for retrieval tasks.
 Augmentation Phase: Add related prompt templates to prepare a more comprehensive response.
 Generation Phase: Utilize the Mixtral 7B model to generate a response based on the retrieved and augmented information.
