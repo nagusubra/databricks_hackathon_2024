@@ -58,10 +58,4 @@ In crafting Asset Nav Assistant, we employed Databricks and AWS as our foundatio
 9. Integerate a CI/CD cycle for the RAG pipeline.
 
 
-## Team details
-
-1. People's name on your team: Jingwen Huang and Subramanian Narayanan
-2. Email Address (of each participant): jingwen_huang@transalta.com and subramanian_narayanan@transalta.com
-3. Company/Organization you guys work for/represent: TransAlta
-4. Country: Canada
-5. Industry prize you are going for: Manufacturing and Energy
+Project Presentation: https://www.youtube.com/watch?v=mV-gipsRPXE
