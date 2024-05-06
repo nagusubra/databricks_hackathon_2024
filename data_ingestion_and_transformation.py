@@ -252,6 +252,10 @@ print(f"Endpoint named {VECTOR_SEARCH_ENDPOINT_NAME} is ready.")
 
 # COMMAND ----------
 
+VECTOR_SEARCH_ENDPOINT_NAME
+
+# COMMAND ----------
+
 #The table we'd like to index
 source_table_fullname = f"{catalog}.{db}.pdf_transformed"
 # Where we want to store our index

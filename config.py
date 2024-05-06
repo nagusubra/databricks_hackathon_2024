@@ -13,7 +13,7 @@
 desired_chunk_size = 200
 desired_overlap_size = 20
 desired_k_value = 3
-iterative_text = "_chunk_200_op_20_k_3" # _chunk_200_op_20_k_3
+iterative_text = "_chunk_200_op_20_k_3_subu" # _chunk_200_op_20_k_3
 
 # automated inference use case
 catalog = "main"

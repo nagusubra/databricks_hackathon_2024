@@ -146,7 +146,7 @@ def assistant_message_html(message):
                         border-radius: 20px;
                         background: linear-gradient(to left, {rag_background_color}, {user_background_color});
                         padding: 20px;
-                        box-shadow: {box_shadow};
+                        box-shadow: {left_box_shadow};
                         margin-bottom: 20px;
                         margin-left: auto;
                         margin-right: 20%;
@@ -196,142 +196,142 @@ def assistant_message_html(message):
 
 # COMMAND ----------
 
-# for tablet/mobile app
+# # for tablet/mobile app
 
-right_box_shadow = "10px 10px 10px #0077cc"
-left_box_shadow = "-10px 10px 10px #0077cc"
-user_background_color = "#fdbf77"
-rag_background_color = "#fb9313"
+# right_box_shadow = "10px 10px 10px #0077cc"
+# left_box_shadow = "-10px 10px 10px #0077cc"
+# user_background_color = "#fdbf77"
+# rag_background_color = "#fb9313"
 
-def user_message_html(message):
-    return f"""
-                <head>
-                <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+# def user_message_html(message):
+#     return f"""
+#                 <head>
+#                 <style>
+#                     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
-                    .glow {{
-                            font-weight: bold;
-                            text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
-                    }}
+#                     .glow {{
+#                             font-weight: bold;
+#                             text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
+#                     }}
 
-                    /* Custom CSS for chat bubbles */
-                    .chat-container-user {{
-                        width: 35%;
-                        border-radius: 20px;
-                        background: linear-gradient(to left, {user_background_color}, {rag_background_color});
-                        padding: 20px;
-                        box-shadow: {right_box_shadow};
-                        margin-bottom: 20px;
-                        margin-left: 25%;
-                        margin-right: 25%;
-                        font-size: 16px;
-                        color: white;
-                        font-weight: bold;
-                        font-family: 'Poppins', sans-serif;
-                        position: relative;
-                        overflow: hidden;
-                    }}
+#                     /* Custom CSS for chat bubbles */
+#                     .chat-container-user {{
+#                         width: 20%;
+#                         border-radius: 20px;
+#                         background: linear-gradient(to left, {user_background_color}, {rag_background_color});
+#                         padding: 20px;
+#                         box-shadow: {right_box_shadow};
+#                         margin-bottom: 20px;
+#                         margin-left: 25%;
+#                         margin-right: 25%;
+#                         font-size: 16px;
+#                         color: white;
+#                         font-weight: bold;
+#                         font-family: 'Poppins', sans-serif;
+#                         position: relative;
+#                         overflow: hidden;
+#                     }}
 
-                    .chat-bubble-user {{
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        right: 0;
-                        width: 0;
-                        height: 0;
-                        border-top: 20px solid transparent;
-                        border-left: 20px solid {user_background_color};
-                        border-right: 20px solid transparent;
-                        border-bottom: 20px solid transparent;
-                    }}
+#                     .chat-bubble-user {{
+#                         content: '';
+#                         position: absolute;
+#                         top: 0;
+#                         right: 0;
+#                         width: 0;
+#                         height: 0;
+#                         border-top: 20px solid transparent;
+#                         border-left: 20px solid {user_background_color};
+#                         border-right: 20px solid transparent;
+#                         border-bottom: 20px solid transparent;
+#                     }}
 
-                    .avatar-user {{
-                        width: 60px;
-                        height: 60px;
-                        border-radius: 50%;
-                        margin-left: 10px;
-                    }}
+#                     .avatar-user {{
+#                         width: 60px;
+#                         height: 60px;
+#                         border-radius: 50%;
+#                         margin-left: 10px;
+#                     }}
 
-                    .message-text-user {{
-                        flex: 1;
-                    }}
-                </style>
-                </head>
+#                     .message-text-user {{
+#                         flex: 1;
+#                     }}
+#                 </style>
+#                 </head>
 
-                <div class="chat-container-user">
-                    <div style="display: flex; align-items: center;">
-                        <div class="message-text-user">
-                            { f"<h1 class=glow><strong>You</strong> <br></h1>" +  message}
-                        </div>
-                        <img class="avatar-user" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png?raw=true"/>
-                    </div>
-                </div>
-            """
+#                 <div class="chat-container-user">
+#                     <div style="display: flex; align-items: center;">
+#                         <div class="message-text-user">
+#                             { f"<h1 class=glow><strong>You</strong> <br></h1>" +  message}
+#                         </div>
+#                         <img class="avatar-user" src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png?raw=true"/>
+#                     </div>
+#                 </div>
+#             """
 
-def assistant_message_html(message):
-    return f"""
-                <head>
-                <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+# def assistant_message_html(message):
+#     return f"""
+#                 <head>
+#                 <style>
+#                     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
-                    .glow {{
-                            font-weight: bold;
-                            text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
-                    }}
+#                     .glow {{
+#                             font-weight: bold;
+#                             text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff, 0 0 2px #fff;
+#                     }}
 
-                    /* Custom CSS for chat bubbles */
-                    .chat-container-assistant {{
-                        width: 35%;
-                        border-radius: 20px;
-                        background: linear-gradient(to left, {rag_background_color}, {user_background_color});
-                        padding: 20px;
-                        box-shadow: {left_box_shadow};
-                        margin-bottom: 20px;
-                        margin-left: 15%;
-                        margin-right: 15%;
-                        font-size: 16px;
-                        color: white;
-                        font-weight: bold;
-                        font-family: 'Poppins', sans-serif;
-                        position: relative;
-                        overflow: hidden;
-                    }}
+#                     /* Custom CSS for chat bubbles */
+#                     .chat-container-assistant {{
+#                         width: 20%;
+#                         border-radius: 20px;
+#                         background: linear-gradient(to left, {rag_background_color}, {user_background_color});
+#                         padding: 20px;
+#                         box-shadow: {left_box_shadow};
+#                         margin-bottom: 20px;
+#                         margin-left: 15%;
+#                         margin-right: 15%;
+#                         font-size: 16px;
+#                         color: white;
+#                         font-weight: bold;
+#                         font-family: 'Poppins', sans-serif;
+#                         position: relative;
+#                         overflow: hidden;
+#                     }}
 
-                    .chat-bubble-assistant {{
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 0;
-                        height: 0;
-                        border-top: 20px solid transparent;
-                        border-right: 20px solid {rag_background_color};
-                        border-left: 20px solid transparent;
-                        border-bottom: 20px solid transparent;
-                    }}
+#                     .chat-bubble-assistant {{
+#                         content: '';
+#                         position: absolute;
+#                         top: 0;
+#                         left: 0;
+#                         width: 0;
+#                         height: 0;
+#                         border-top: 20px solid transparent;
+#                         border-right: 20px solid {rag_background_color};
+#                         border-left: 20px solid transparent;
+#                         border-bottom: 20px solid transparent;
+#                     }}
 
-                    .avatar-assistant {{
-                        width: 60px;
-                        height: 60px;
-                        border-radius: 50%;
-                        margin-right: 10px;
-                    }}
+#                     .avatar-assistant {{
+#                         width: 60px;
+#                         height: 60px;
+#                         border-radius: 50%;
+#                         margin-right: 10px;
+#                     }}
 
-                    .message-text-assistant {{
-                        flex: 1;
-                    }}
-                </style>
-                </head>
+#                     .message-text-assistant {{
+#                         flex: 1;
+#                     }}
+#                 </style>
+#                 </head>
 
-                <div class="chat-container-assistant">
-                    <div style="display: flex; align-items: center;">
-                        <img class="avatar-assistant" src="https://e7.pngegg.com/pngimages/498/917/png-clipart-computer-icons-desktop-chatbot-icon-blue-angle-thumbnail.png?raw=true"/>
-                        <div class="message-text-assistant">
-                            {"<h1 class=glow ><strong>Asset Nav Assistant</strong> <br></h1>" + message}
-                        </div>
-                    </div>
-                </div>
-            """
+#                 <div class="chat-container-assistant">
+#                     <div style="display: flex; align-items: center;">
+#                         <img class="avatar-assistant" src="https://e7.pngegg.com/pngimages/498/917/png-clipart-computer-icons-desktop-chatbot-icon-blue-angle-thumbnail.png?raw=true"/>
+#                         <div class="message-text-assistant">
+#                             {"<h1 class=glow ><strong>Asset Nav Assistant</strong> <br></h1>" + message}
+#                         </div>
+#                     </div>
+#                 </div>
+#             """
 
 # COMMAND ----------
 
@@ -376,9 +376,9 @@ def chatbot_interface(user_input, dialog_history_for_rag, dialog_history_for_use
 #   'dbfs:/Volumes/main/asset_nav/volume_oem_documentation/input_data/BP150_Manual_Kaco blueplanet_ Event codes - Vendor status codes - good.pdf',
 #   'dbfs:/Volumes/main/asset_nav/volume_oem_documentation/input_data/BP150_Manual_Kaco blueplanet_1-9-2023 DCB - Manual extended - medium - 2.pdf']}
 
-    response = {'result': "My purpose is to provide accurate and reliable assistance to engineers and technicians in solar energy operations and maintenance, with a focus on management of solar energy assets. I possess extensive expertise in solar energy production, operations and maintenance, and the guidelines provided by solar original equipment manufacturers (OEMs). I can help with understanding technical manuals and documentation, and have a deep understanding of electrical engineering principles as they apply to solar energy systems. My goal is to ensure the seamless functioning of solar energy systems by providing professional answers with depth and detail. If I don't have the information, I will honestly acknowledge my limitation."}
+    # response = {'result': "My purpose is to provide accurate and reliable assistance to engineers and technicians in solar energy operations and maintenance, with a focus on management of solar energy assets. I possess extensive expertise in solar energy production, operations and maintenance, and the guidelines provided by solar original equipment manufacturers. If I don't have the information, I will honestly acknowledge my limitation."}
     
-    # response = rag_model.invoke(dialog_history_for_rag)
+    response = rag_model.invoke(dialog_history_for_rag)
 
     dialog_history_for_rag["messages"].append({"role": "assistant", "content": response["result"]})
 
