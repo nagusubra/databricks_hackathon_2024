@@ -1,3 +1,6 @@
+![Asset Nav Assistant - future app mock up](https://github.com/nagusubra/databricks_hackathon_2024/assets/52630559/de49baaa-b123-4172-91a3-160586141e70)
+Asset Nav Assistant app mock up
+
 ## Inspiration
 
 In the Energy and Manifacturing industry, a major hurdle is the time technicians and engineers lose grappling with accessing and searching through extensive documentation to diagnose site issues. This bottleneck not only delays crucial work but also drains productivity.
