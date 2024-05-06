@@ -10,9 +10,9 @@ Our goal is to empower professionals to understand complex documents and get fas
 
 ## What it does
 
-Asset Nav Assistant serves as an accurate Asset information assistant, eliminating the need to wait for document access or sift through extensive files to complete vital tasks. It offers a solution capable of accessing the latest data, breaking through data silos so employees can efficiently navigate various data points.
-
-Moreover, we aim to develop a guide for new employees, revolutionizing traditional training programs by providing them with more pertinent and current information.
+Our chatbot, Asset Nav Assistant, functions as an accurate Asset information assistant. It efficiently navigates vast documents to swiftly deliver accurate answers for users, saving proffesionals' time and effort. By eliminating the need to wait for document access or manually search through extensive files, it facilitates the completion of vital tasks seamlessly.
+ 
+Moreover, we aim to develop a guide for new employees, this guide will offer more pertinent and current information, ensuring that new employees are equipped with the knowledge they need to succeed in their tasks.
 
 
 ## How we built it
