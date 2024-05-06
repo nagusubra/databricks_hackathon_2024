@@ -26,6 +26,8 @@ Generation Phase: Utilize the Mixtral 7B model to generate a response based on t
 Evaluation Phase: Evaluate the generated response to ensure its quality, readability, relevance, professionalism, and faithfulness. This iterative process allows us to fine-tune our model to achieve optimal performance.
 Interface Phase: Design an interface to allow users to interact with the final product within Databricks. This interface facilitates efficient access to information and enhances the overall user experience.
 
+We employed Databricks and AWS as our foundational technologies. Harnessing the power of industry-leading cloud providers such as AWS and Databricks, we constructed an end-to-end RAG pipeline. Our core Large Language Model for this pipeline is the Mixtral 7B model, complemented by the DBRX instruct model for evaluation purposes.
+
 
 ## Challenges we ran into
 
