@@ -3,9 +3,9 @@ Asset Nav Assistant app mock up
 
 ## Inspiration
 
-In the Energy and Manifacturing industry, a major hurdle is the time technicians and engineers lose grappling with accessing and searching through extensive documentation to diagnose site issues. This bottleneck not only delays crucial work but also drains productivity.
+In the Energy and Manufacturing industry, a major hurdle that technicians and engineers face is that they spend valuable time grappling with extensive documentation to diagnose site issues. This bottleneck not only delays crucial work but also drains productivity. 
 
-Our goal is to empower field service agents and engineers, streamlining their workflow for optimal productivity. By doing so, we aim to elevate organizational value through a more efficient and effective workforce.
+Our goal is to empower professionals to understand complex documents and get fast and accurate answers. By doing so, people can allocate their time more effectively and nurture an efficient and effective workforce.
 
 
 ## What it does
